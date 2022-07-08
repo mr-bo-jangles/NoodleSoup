@@ -14,4 +14,4 @@ RUN poetry install --no-root --no-dev
 COPY ./src ./src
 RUN poetry install --no-dev
 
-CMD ["poetry", "run", "/app/src/main.py"]
+ENTRYPOINT ["poetry", "run", "/app/src/main.py"]
