@@ -1,7 +1,7 @@
 # Import libraries
 import os
 import functools
-import discord as discord
+import discord
 from discord.ext import commands
 from keep_alive import keep_alive, end_keep_alive
 # Declare intents to enable full perms
