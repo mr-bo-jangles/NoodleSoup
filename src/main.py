@@ -1,7 +1,7 @@
 # Import libraries
 import os
 import functools
-import discord as discord
+import discord
 from discord.ext import commands
 
 # Declare intents to enable full perms
