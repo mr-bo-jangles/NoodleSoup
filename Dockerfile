@@ -1,4 +1,4 @@
-FROM python:3.10-slim-buster
+FROM python:3.10
 
 WORKDIR /app
 
@@ -14,4 +14,4 @@ RUN poetry install --no-root --no-dev
 COPY ./src ./src
 RUN poetry install --no-dev
 
-ENTRYPOINT ["poetry", "run", "/app/src/main.py"]
+ENTRYPOINT ["poetry", "run", "python", "/app/src/main.py"]
