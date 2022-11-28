@@ -3,7 +3,7 @@ import os
 import functools
 import discord
 from discord.ext import commands
-
+import datetime as dt
 # Declare intents to enable full perms
 intents = discord.Intents.default()
 intents.members = True
@@ -25,7 +25,13 @@ def check_for_all_roles(ctx, role_ids):
     return not all(
         getter(id=item) is not None if isinstance(item, int) else getter(name=item) is not None for item in role_ids)
 
-
+def time_to_int(dateobj):
+    total = int(dateobj.strftime('%S'))
+    total += int(dateobj.strftime('%M')) * 60
+    total += int(dateobj.strftime('%H')) * 60 * 60
+    total += (int(dateobj.strftime('%j')) - 1) * 60 * 60 * 24
+    total += (int(dateobj.strftime('%Y')) - 1970) * 60 * 60 * 24 * 365
+    return total
 # Events
 @bot.event
 async def on_ready():
@@ -62,6 +68,35 @@ async def _getinvite(ctx):
     await ctx.message.delete()  # Delete command message
     print(f'getinvite command called by {ctx.author}')  # Log command usage
 
+
+@bot.command(name="verify")
+async def _verify(ctx):
+    if check_for_any_roles(ctx, ["Verified Member"]):  # Check for role ID
+        joindate = ctx.author.joined_at
+        joinint = time_to_int(joindate)
+        currentdate = dt.datetime.now()
+        currentint = time_to_int(currentdate)
+        duration = (currentint - joinint)/(60*60*24)
+        print(duration)
+        if duration >= 7:
+            channel = discord.utils.get(ctx.guild.text_channels, name='dyno-logs')  # Get server logging channel
+            role = discord.utils.get(ctx.guild.roles, id=977917138109087775)  # Get Curator role
+            await channel.send(
+                f"{role.mention} User {ctx.author.mention} has requested verification!")  # Post notif at curators
+
+            await ctx.send(
+                f'{ctx.author.mention}I have let the Curators know that you want to be verified.\n '
+                'Please make sure you are registered here: https://robertsspaceindustries.com/orgs/CRSHLANDIN')
+
+        else:
+            await ctx.send(
+                f'{ctx.author.mention}I am sorry, but you need to be on our discord for 7 days before you can be verified.  Please try again later.')
+    else:
+        await ctx.send(
+            f'You are already verified,{ctx.author.mention}!')
+        # ^^^ Post notif to user in context channel
+    await ctx.message.delete()  # Delete command message
+    print(f'verify command called by {ctx.author}')  # Log command usage
 
 @bot.command(name="info")
 async def _info(ctx):
