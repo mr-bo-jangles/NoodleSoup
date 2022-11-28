@@ -90,7 +90,9 @@ async def _verify(ctx):
 
         else:
             await ctx.send(
-                f'{ctx.author.mention}I am sorry, but you need to be on our discord for 7 days before you can be verified.  Please try again later.')
+                f'{ctx.author.mention}I am sorry, but you need to be on our discord for 7 days before you can be '
+                f'verified (your time is currently {round(duration)} days).  Please try again later.')
+
     else:
         await ctx.send(
             f'You are already verified,{ctx.author.mention}!')
