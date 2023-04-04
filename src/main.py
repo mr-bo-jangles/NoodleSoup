@@ -78,7 +78,7 @@ async def _verify(ctx):
         currentint = time_to_int(currentdate)
         duration = (currentint - joinint)/(60*60*24)
         print(duration)
-        if duration >= 7:
+        if duration >= 6.9:
             channel = discord.utils.get(ctx.guild.text_channels, name='dyno-logs')  # Get server logging channel
             role = discord.utils.get(ctx.guild.roles, id=977917138109087775)  # Get Curator role
             await channel.send(
@@ -91,12 +91,17 @@ async def _verify(ctx):
         else:
             await ctx.send(
                 f'{ctx.author.mention}I am sorry, but you need to be on our discord for 7 days before you can be '
-                f'verified (your time is currently {round(duration)} days).  Please try again later.')
+                f'verified (your time is currently {round(duration, 1)} days).  Please try again later.')
 
     else:
-        await ctx.send(
-            f'You are already verified,{ctx.author.mention}!')
-        # ^^^ Post notif to user in context channel
+        if check_for_any_roles(ctx, ["Server Visitor"]):  # Check for visitor type
+            await ctx.send(
+                f'You cannot verify for SC membership as a Visitor,{ctx.author.mention}.')
+            # ^^^ Post notif to user in context channel
+        else:
+            await ctx.send(
+                f'It seems you are already verified,{ctx.author.mention}.')
+            # ^^^ Post notif to user in context channel
     await ctx.message.delete()  # Delete command message
     print(f'verify command called by {ctx.author}')  # Log command usage
 
