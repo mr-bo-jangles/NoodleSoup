@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: noodle-soup
+spec:
+  selector:
+    matchLabels:
+      app: noodle-soup
+      app.kubernetes.io/name: noodle-soup
+  serviceName: noodle-soup
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: noodle-soup
+        app.kubernetes.io/name: noodle-soup
+    spec:
+      containers:
+      - name: noodle-soup
+        image: noodle-soup:5.7
+        env:
+        - name: noodle-soup_ALLOW_EMPTY_PASSWORD
+          value: "1"
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/noodle-soup
+          subPath: noodle-soup
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        livenessProbe:
+          exec:
+            command: ["noodle-soupadmin", "ping"]
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            # Check we can execute queries over TCP (skip-networking is off).
+            command: ["noodle-soup", "-h", "127.0.0.1", "-e", "SELECT 1"]
+          initialDelaySeconds: 5
+          periodSeconds: 2
+          timeoutSeconds: 1
+      volumes:
+      - name: conf
+        emptyDir: {}
+      - name: config-map
+        configMap:
+          name: noodle-soup
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
