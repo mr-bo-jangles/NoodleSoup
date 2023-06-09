@@ -1,4 +1,4 @@
-FROM python:3.10-slim-buster
+FROM python:3.10
 
 WORKDIR /app
 
@@ -11,5 +11,7 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root --no-dev
 
 # Copy in everything else and install:
-COPY . .
+COPY ./src ./src
 RUN poetry install --no-dev
+
+ENTRYPOINT ["poetry", "run", "python", "/app/src/main.py"]
