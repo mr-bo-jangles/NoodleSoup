@@ -3,6 +3,7 @@ name = "NoodleSoup"
 version = "1.0.1"
 description = "Admin bot for a private gaming server."
 authors = ["SuperNoodle", "ZeroNationality"]
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.8"
