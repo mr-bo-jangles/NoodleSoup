@@ -1,3 +1,6 @@
+[project]
+requires-python = ">=3.10,<4.0"
+
 [tool.poetry]
 name = "NoodleSoup"
 version = "1.0.1"
@@ -6,11 +9,13 @@ authors = ["SuperNoodle", "ZeroNationality"]
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.8"
-discord = "^1.7.3"
+python = ">=3.10,<4.0"
+discord = "^2.3.2"
+async-tinydb = "^1.7.2"
 
 [tool.poetry.dev-dependencies]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
