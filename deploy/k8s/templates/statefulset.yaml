@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: noodle-soup
+  namespace: noodle-soup
+spec:
+  selector:
+    matchLabels:
+      app: noodle-soup
+      app.kubernetes.io/name: noodle-soup
+  serviceName: noodle-soup
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: noodle-soup
+        app.kubernetes.io/name: noodle-soup
+    spec:
+      containers:
+      - name: noodle-soup
+        image: ghcr.io/mr-bo-jangles/noodlesoup:main
+        imagePullPolicy: Always
+        env:
+        - name: TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: noodle-soup-discord-token
+              key: token
+        resources:
+          requests:
+            cpu: 50m
+            memory: 20M
