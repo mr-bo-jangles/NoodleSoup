@@ -7,6 +7,8 @@ import discord
 from discord.ext import commands
 import datetime as dt
 
+CURATOR_ROLE_ID = 977917138109087775
+
 # Declare intents to enable full perms
 intents = discord.Intents.default()
 intents.members = True
@@ -99,7 +101,7 @@ async def _verify(ctx):
             print(duration)
             if duration >= 6.9:
                 channel = discord.utils.get(ctx.guild.text_channels, name='dyno-logs')  # Get server logging channel
-                role = discord.utils.get(ctx.guild.roles, id=977917138109087775)  # Get Curator role
+                role = discord.utils.get(ctx.guild.roles, id=CURATOR_ROLE_ID)  # Get Curator role
                 await channel.send(
                     f"{role.mention} User {ctx.author.mention} has requested verification!"
                 )  # Post notif at curators
@@ -147,7 +149,7 @@ async def _info(ctx):
 
 @bot.command(name="restart")
 async def _restart(ctx):
-    role = discord.utils.get(ctx.guild.roles, id=977917138109087775)
+    role = discord.utils.get(ctx.guild.roles, id=CURATOR_ROLE_ID)
     if role in ctx.author.roles:
         sys.exit(0)
 
