@@ -4,7 +4,7 @@ from discord.ext import commands
 from discord.ext.commands import Cog
 
 
-from src.utils import check_for_any_roles
+from utils import check_for_any_roles
 
 class GetInvite(Cog):
 

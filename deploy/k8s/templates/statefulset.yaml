@@ -36,8 +36,10 @@ spec:
   volumeClaimTemplates:
     - metadata:
         name: database
+        namespace: noodle-soup
       spec:
         accessModes: [ "ReadWriteOnce" ]
+        storageClassName: csi-cinder-high-speed
         resources:
           requests:
             storage: 1Gi
