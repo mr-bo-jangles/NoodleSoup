@@ -57,7 +57,7 @@ class NoodleSoup(commands.Bot):
         await self.change_presence(
             activity=discord.Activity(
                 type=discord.ActivityType.competing,
-                name="worst docs"
+                name="the worst docs"
             )
         )
         print('We have logged in as {0.user}'.format(self))
@@ -87,7 +87,7 @@ async def main():
     async with ClientSession() as our_client, TinyDB('db.json') as db:
         # 2. We become responsible for starting the bot.
 
-        exts = ['restart', 'info', 'get_invite', 'verify', 'dynamic_voice', "test"]
+        exts = ['restart', 'get_invite', 'verify', 'dynamic_voice']
 
         intents = discord.Intents.default()
         intents.members = True

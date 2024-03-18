@@ -5,16 +5,9 @@ import discord
 CURATOR_ROLE_ID = 977917138109087775
 
 
-def check_for_any_roles(ctx, role_ids):
-    getter = functools.partial(discord.utils.get, ctx.author.roles)
+def check_for_any_roles(user: discord.Member, role_ids):
+    getter = functools.partial(discord.utils.get, user.roles)
     return not any(
-        getter(id=item) is not None if isinstance(item, int) else getter(name=item) is not None for item in role_ids
-    )
-
-
-def check_for_all_roles(ctx, role_ids):
-    getter = functools.partial(discord.utils.get, ctx.author.roles)
-    return not all(
         getter(id=item) is not None if isinstance(item, int) else getter(name=item) is not None for item in role_ids
     )
 
