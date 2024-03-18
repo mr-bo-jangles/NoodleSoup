@@ -30,3 +30,14 @@ spec:
           requests:
             cpu: 50m
             memory: 20M
+        volumeMounts:
+          - mountPath: "/src/db/"
+            name: database
+  volumeClaimTemplates:
+    - metadata:
+        name: database
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
