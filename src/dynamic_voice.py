@@ -20,7 +20,7 @@ class DynamicVoice(Cog):
     def cog_unload(self):
         self.channel_observe.cancel()
 
-    @tasks.loop(minutes=20)
+    @tasks.loop(minutes=15)
     async def channel_observe(self):
         i = 0
         for guild in self.bot.guilds:
@@ -31,7 +31,7 @@ class DynamicVoice(Cog):
                     i += 1
             if i > 0:
                 channel = discord.utils.get(guild.text_channels, name='dyno-logs')
-                await channel.send("20 minute check: the above dynamic channels had no users and were deleted.")
+                await channel.send("15 minute check: the above dynamic channels had no users and were deleted.")
 
 
     @channel_observe.before_loop
@@ -87,13 +87,15 @@ class DynamicVoice(Cog):
     def in_channel_name(self, voice_state, channel_name: str):
         return voice_state.channel.name == channel_name
 
-    @app_commands.command(name="createdynamicvoice", description="Create a dynamic voice generator channel")
+    @app_commands.describe(category="The category this channel be in",
+                           name="Name of this channel's \bchildren\b")
+    @app_commands.command(name="createdynamicvoice", description="Creates a new dynamic voice generator channel")
     async def _create_dynamic_voice(self, interaction: discord.Interaction, category: discord.CategoryChannel, name: str):
         logger.info("fuck me")
         await interaction.response.defer(ephemeral=True)
         if admin_check(interaction):
             channel = await interaction.guild.create_voice_channel(
-                name=name,
+                name=f"Create new {name}",
                 overwrites={},
                 category=category,
                 position=len(interaction.channel.category.channels),
