@@ -5,7 +5,7 @@ from discord import app_commands
 from discord.ext import commands
 from discord.ext.commands import Cog
 
-from src.utils import admin_check
+from utils import admin_check
 
 class Restart(Cog):
     def __init__(self, bot: commands.bot):
