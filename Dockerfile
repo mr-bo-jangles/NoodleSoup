@@ -12,7 +12,7 @@ RUN poetry install --no-root --no-dev
 
 # Copy in everything else and install:
 COPY ./src ./src
-RUN mkdir -p ./src/db
+RUN mkdir -p /app/src/db/
 
 RUN poetry install --no-dev
 
