@@ -31,13 +31,15 @@ spec:
             cpu: 50m
             memory: 20M
         volumeMounts:
-          - mountPath: "/src/db/"
+          - mountPath: "/app/src/db/"
             name: database
   volumeClaimTemplates:
     - metadata:
         name: database
+        namespace: noodle-soup
       spec:
         accessModes: [ "ReadWriteOnce" ]
+        storageClassName: csi-cinder-high-speed
         resources:
           requests:
             storage: 1Gi
