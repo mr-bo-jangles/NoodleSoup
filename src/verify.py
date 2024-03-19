@@ -5,7 +5,7 @@ from discord.ext import commands
 from discord.ext.commands import Cog
 
 
-from utils import check_for_any_roles, time_to_int, CURATOR_ROLE_ID
+from src.utils import check_for_any_roles, time_to_int, CURATOR_ROLE_ID
 
 class Verify(Cog):
     def __init__(self, bot: commands.bot):
