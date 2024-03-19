@@ -12,6 +12,8 @@ RUN poetry install --no-root --no-dev
 
 # Copy in everything else and install:
 COPY ./src ./src
+RUN mkdir -p /app/src/db/
+
 RUN poetry install --no-dev
 
 ENTRYPOINT ["poetry", "run", "python", "/app/src/main.py"]

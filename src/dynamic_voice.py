@@ -7,7 +7,7 @@ from discord.ext.commands import Cog
 from asynctinydb import Document
 
 
-from src.utils import admin_check
+from utils import admin_check
 
 logger = logging.getLogger('discord')
 
