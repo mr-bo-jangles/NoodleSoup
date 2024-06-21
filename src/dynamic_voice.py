@@ -6,21 +6,22 @@ from discord.ext import commands, tasks
 from discord.ext.commands import Cog
 from asynctinydb import Document
 
-
+from src.main import NoodleSoup
 from utils import admin_check
 
 logger = logging.getLogger('discord')
+INITIAL_DOCUMENT_COUNT = 1
 
 class DynamicVoice(Cog):
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: NoodleSoup):
         self.bot = bot
         self.channel_observe.start()
 
     def cog_unload(self):
         self.channel_observe.cancel()
 
-    @tasks.loop(minutes=15)
+    @tasks.loop(minutes=5)
     async def channel_observe(self):
         i = 0
         for guild in self.bot.guilds:
@@ -30,8 +31,7 @@ class DynamicVoice(Cog):
                 if deleted:
                     i += 1
             if i > 0:
-                channel = discord.utils.get(guild.text_channels, name='dyno-logs')
-                await channel.send("15 minute check: the above dynamic channels had no users and were deleted.")
+                pass
 
 
     @channel_observe.before_loop
@@ -42,8 +42,16 @@ class DynamicVoice(Cog):
 
     async def safe_delete_channel(self, channel: discord.VoiceChannel) -> bool:
         if await self.is_in_createdchannel_table(channel.id) and channel.members == []:
+            gen_channels = self.bot.db.table("gen_channels")
             created_channels = self.bot.db.table("created_channels")
+            assoc_id = await created_channels.get(doc_id=channel.id)
+            parent_id = assoc_id.get("parent", 0)
+            parent = await gen_channels.get(doc_id=parent_id)
+            children = parent.get("children", {})
+            new_children = {key:value for (key,value) in children.items() if value != channel.id}
+            await gen_channels.update({"children": new_children}, doc_ids=[parent_id])
             await created_channels.remove(doc_ids=[channel.id])
+            print(f" Deleted {channel.name} \n -----------------------------------------")
             await channel.delete(reason="No members in generated channel.")
             return True
         else:
@@ -53,27 +61,45 @@ class DynamicVoice(Cog):
     def was_disconnected(self, before: VoiceState, after: VoiceState):
         return before.channel is None and after.channel is not None
 
+    def has_joined(self, before: VoiceState, after: VoiceState):
+        if before.channel is None or after.channel is None:
+            return False
+        return before.channel.id != after.channel.id
+
 
     def in_chat_category(self, voice_state: VoiceState, channel_category_id: int):
         return voice_state.channel.category_id == channel_category_id
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: Member, before: VoiceState, after: VoiceState):
-        if self.was_disconnected(
-                before=before,
-                after=after
-        ) and await self.is_in_genchannel_table(after.channel.id
+        if (self.was_disconnected(before=before, after=after) or self.has_joined(before=before, after=after)) and await self.is_in_genchannel_table(after.channel.id
         ):
-            channel = discord.utils.get(member.guild.text_channels, name='dyno-logs')
-            await channel.send("Generator channel joined, creating channel and moving user...")
-            new_channel = await after.channel.category.create_voice_channel(
-                name=f"{after.channel.name.replace('Create','')} {(len(after.channel.category.voice_channels)-2)}",
-                position=len(after.channel.category.channels),
-            )
-            created_channels = self.bot.db.table("created_channels")
-            await created_channels.insert(Document({'name': new_channel.name}, doc_id=new_channel.id))
-            # await new_channel.edit(status="I want to set a status too")
-            await member.move_to(new_channel, reason="Moved member to their generated voice channel")
+            gen_channels = self.bot.db.table("gen_channels")
+            document = await gen_channels.get(doc_id=after.channel.id)
+            children = document.get("children", {})
+            print("NEW CHANNEL CREATION")
+            print(f"Request from {member.name}")
+            print(f"{after.channel.name}")
+            print(f"Children: {children}.  Checking Indexes...")
+            for index in range(1, len(children)+2):
+                child = children.get(str(index))
+                print(f"{index}")
+                if child is not None:
+                    continue
+                else:
+                    print(f"First free index: {index}")
+                    new_channel = await after.channel.category.create_voice_channel(
+                        name=f"{after.channel.name.replace('Create', '')} {index}",
+                        position=after.channel.position+index,
+                    )
+                    await new_channel.edit(position=after.channel.position+index)
+                    await gen_channels.update({"children": { **children, str(index): new_channel.id}}, doc_ids=[after.channel.id])
+                    created_channels = self.bot.db.table("created_channels")
+                    await created_channels.insert(Document({'name': new_channel.name, 'parent': after.channel.id}, doc_id=new_channel.id))
+                    # await new_channel.edit(status="I want to set a status too")
+                    await member.move_to(new_channel, reason="Moved member to their generated voice channel")
+                    print(f"Created {new_channel.name}, id {new_channel.id} \n -----------------------------------------")
+                    break
 
 
     async def is_in_genchannel_table(self, channel_id: int):
@@ -95,19 +121,17 @@ class DynamicVoice(Cog):
         await interaction.response.defer(ephemeral=True)
         if admin_check(interaction):
             channel = await interaction.guild.create_voice_channel(
-                name=f"Create new {name}",
+                name=f"Create {name}",
                 overwrites={},
                 category=category,
                 position=len(interaction.channel.category.channels),
                 bitrate=64_000,
-                user_limit=0,
+                user_limit=1,
                 video_quality_mode=discord.VideoQualityMode.auto
             )
             gen_channels = self.bot.db.table("gen_channels")
-            await gen_channels.insert(Document({'name': channel.name}, doc_id=channel.id))
+            await gen_channels.insert(Document({'name': channel.name, 'children': {}}, doc_id=channel.id))
             await interaction.followup.send(f"{name} channel created in {category}.")
-            channel = discord.utils.get(interaction.guild.text_channels, name='dyno-logs')
-            await channel.send("The above channel is a newly-made dynamic voice generator.")
         else:
             await interaction.followup.send("This command is locked to Curators only.")
 
@@ -122,8 +146,6 @@ class DynamicVoice(Cog):
             gen_channels = self.bot.db.table("gen_channels")
             await gen_channels.remove(doc_ids=[channel.id])
             await interaction.followup.send(f"{name} deleted from {category}.")
-            channel = discord.utils.get(interaction.guild.text_channels, name='dyno-logs')
-            await channel.send("The above channel is a deleted dynamic voice generator.")
         else:
             await interaction.followup.send("This command is locked to Curators only.")
 async def setup(bot):

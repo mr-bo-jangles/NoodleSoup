@@ -84,7 +84,7 @@ async def main():
     # Here we have a web client and a database pool, both of which do cleanup at exit.
     # We also have our bot, which depends on both of these.
 
-    async with ClientSession() as our_client, TinyDB('/app/src/db/db.json') as db:
+    async with ClientSession() as our_client, TinyDB('db.json', sort_keys=True, indent=4, separators=(',', ': ')) as db:
         # 2. We become responsible for starting the bot.
 
         exts = ['restart', 'get_invite', 'verify', 'dynamic_voice']
