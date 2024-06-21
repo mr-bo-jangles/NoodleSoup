@@ -13,6 +13,8 @@ from aiohttp import ClientSession
 
 from asynctinydb import TinyDB, UUID, Document, Query
 
+from migrations import Migrations
+
 
 class NoodleSoup(commands.Bot):
     def __init__(
@@ -84,7 +86,9 @@ async def main():
     # Here we have a web client and a database pool, both of which do cleanup at exit.
     # We also have our bot, which depends on both of these.
 
-    async with ClientSession() as our_client, TinyDB('db.json', sort_keys=True, indent=4, separators=(',', ': ')) as db:
+    db_location = os.getenv('DB_LOCATION', 'db.json')
+
+    async with ClientSession() as our_client, TinyDB(db_location, sort_keys=True, indent=4, separators=(',', ': ')) as db:
         # 2. We become responsible for starting the bot.
 
         exts = ['restart', 'get_invite', 'verify', 'dynamic_voice']
@@ -92,6 +96,8 @@ async def main():
         intents = discord.Intents.default()
         intents.members = True
         intents.messages = True
+
+        migrations = Migrations(db=db)
 
         async with NoodleSoup(
                 commands.when_mentioned_or("&&"),
