@@ -99,8 +99,7 @@ async def main():
             print("We found the test document!")
         else:
             test_id = await startup_test.insert({"test": True})
-            await startup_test.remove(doc_ids=[test_id])
-            print("We found the test document!")
+            print("We created the test document!")
 
 
         # async with NoodleSoup(
