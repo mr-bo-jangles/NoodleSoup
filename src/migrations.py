@@ -1,5 +1,3 @@
-from enum import StrEnum
-
 from asynctinydb import TinyDB, Query, Document
 
 
