@@ -6,7 +6,7 @@ from discord.ext import commands, tasks
 from discord.ext.commands import Cog
 from asynctinydb import Document
 
-from src.main import NoodleSoup
+from main import NoodleSoup
 from utils import admin_check
 
 logger = logging.getLogger('discord')
