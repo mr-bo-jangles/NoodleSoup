@@ -11,7 +11,7 @@ import discord
 from discord.ext import commands
 from aiohttp import ClientSession
 
-from asynctinydb import TinyDB
+from asynctinydb import TinyDB, UUID, Document, Query
 
 
 class NoodleSoup(commands.Bot):
