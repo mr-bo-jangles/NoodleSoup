@@ -11,7 +11,7 @@ import discord
 from discord.ext import commands
 from aiohttp import ClientSession
 
-from asynctinydb import TinyDB, UUID, Document
+from asynctinydb import TinyDB, UUID, Document, Query
 
 
 class NoodleSoup(commands.Bot):
@@ -94,19 +94,24 @@ async def main():
         intents.messages = True
 
         startup_test = db.table("startup_test")
-        test_id = await startup_test.insert({"test": True})
-        await startup_test.remove(doc_ids=[test_id])
+        searched_documents = await startup_test.search(Query().fragment({"test": True}))
+        for document in searched_documents:
+            print("We found the test document!")
+        else:
+            test_id = await startup_test.insert({"test": True})
+            await startup_test.remove(doc_ids=[test_id])
+            print("We found the test document!")
 
 
-        async with NoodleSoup(
-                commands.when_mentioned_or("&&"),
-                web_client=our_client,
-                initial_extensions=exts,
-                intents=intents,
-                testing_guild_id=977914778762760292,
-                db=db
-        ) as bot:
-            await bot.start(os.getenv('TOKEN', ''))
+        # async with NoodleSoup(
+        #         commands.when_mentioned_or("&&"),
+        #         web_client=our_client,
+        #         initial_extensions=exts,
+        #         intents=intents,
+        #         testing_guild_id=977914778762760292,
+        #         db=db
+        # ) as bot:
+        #     await bot.start(os.getenv('TOKEN', ''))
 
 
 if __name__ == "__main__":
