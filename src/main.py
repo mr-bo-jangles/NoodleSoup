@@ -93,6 +93,10 @@ async def main():
         intents.members = True
         intents.messages = True
 
+        startup_test = db.table("startup_test")
+        test_id = await startup_test.insert({"test": True})
+        await startup_test.remove(doc_ids=[test_id])
+
         async with NoodleSoup(
                 commands.when_mentioned_or("&&"),
                 web_client=our_client,
