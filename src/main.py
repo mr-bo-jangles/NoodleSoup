@@ -98,6 +98,7 @@ async def main():
         intents.messages = True
 
         migrations = Migrations(db=db)
+        await migrations.first_migration()
 
         async with NoodleSoup(
                 commands.when_mentioned_or("&&"),

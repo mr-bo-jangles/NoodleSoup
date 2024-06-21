@@ -6,7 +6,6 @@ class Migrations:
         self.db = db
         self.migration_table = db.table('migrations')
         self.migration_query = Query()
-        self.first_migration()
 
     async def first_migration(self):
         migration_done = await self.migration_table.search(self.migration_query.version == 1)
