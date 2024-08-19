@@ -139,7 +139,7 @@ class DynamicVoice(Cog):
         await interaction.response.defer(ephemeral=True)
         if admin_check(interaction):
             gen_channels = self.bot.db.table("gen_channels")
-            if gen_channels.contains(doc_id=channel.id):
+            if await gen_channels.contains(doc_id=channel.id):
                 await interaction.followup.send(f"{channel.name} channel already registered in DB.")
                 return
             await gen_channels.insert(Document({'name': channel.name, 'children': {}}, doc_id=channel.id))
