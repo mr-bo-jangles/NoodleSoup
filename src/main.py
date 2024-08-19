@@ -91,7 +91,7 @@ async def main():
     async with ClientSession() as our_client, TinyDB(db_location, sort_keys=True, indent=4, separators=(',', ': ')) as db:
         # 2. We become responsible for starting the bot.
 
-        exts = ['restart', 'get_invite', 'verify', 'dynamic_voice']
+        exts = ['restart', 'reset', 'get_invite', 'verify', 'dynamic_voice']
 
         intents = discord.Intents.default()
         intents.members = True
@@ -99,6 +99,7 @@ async def main():
 
         migrations = Migrations(db=db)
         await migrations.first_migration()
+        await migrations.second_migration()
 
         async with NoodleSoup(
                 commands.when_mentioned_or("&&"),
