@@ -133,8 +133,7 @@ class DynamicVoice(Cog):
             await interaction.followup.send(f"{name} channel created in {category}.")
         else:
             await interaction.followup.send("This command is locked to Curators only.")
-    @app_commands.describe(channel="The channel to register with the bot as a dynamic voice channel",
-                           name="Channel to register")
+    @app_commands.describe(channel="The channel to register with the bot as a dynamic voice channel")
     @app_commands.command(name="registerdynamicvoice", description="Register existing dynamic voice generator channel")
     async def _register_dynamic_voice(self, interaction: discord.Interaction, channel: discord.VoiceChannel):
         await interaction.response.defer(ephemeral=True)
