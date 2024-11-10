@@ -1,0 +1,9 @@
+apiVersion: v2
+name: noodle-soup
+version: 8.5.12
+appVersion: 11.3.0
+kubeVersion: "^1.8.0-0"
+description: The leading tool for querying and visualizing time series and metrics.
+home: https://grafana.com
+icon: https://artifacthub.io/image/b4fed1a7-6c8f-4945-b99d-096efa3e4116
+type: application
